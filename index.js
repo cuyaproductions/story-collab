@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
       console.log(`New message from #${authorId}: ${data.message}`);
       messages.push(data.message);
       // emit message to other users
-      socket.emit('new message', data);
+      socket.broadcast.emit('new message', data);
       // send to Firebase to store
     });
 
