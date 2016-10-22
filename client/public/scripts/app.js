@@ -21,8 +21,8 @@ function formSubmitHandler(event) {
   messageInput.value = '';
 }
 
-function newMessageHander(message) {
-  addMessage(message);
+function newMessageHander(data) {
+  addMessage(data.message);
 }
 
 function init() {

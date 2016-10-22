@@ -27,8 +27,11 @@ app.get('*', (request, response) => {
 const messages = [];
 
 io.on('connection', (socket) => {
+  console.log('New author connected.');
     socket.on('add message', (data) => {
       messages.push(data.message);
+      // emit message to other users
+      socket.emit('new message', data);
       // send to Firebase to store
     });
 });
