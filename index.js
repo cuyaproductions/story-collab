@@ -19,12 +19,22 @@ const io = require('socket.io')(server);
 const path = require('path');
 
 const port = process.env.PORT || 3000;
-var messageNumber = 0;
+
+const authors = [];
+const messages = [];
+
+let messageNumber = 0;
+let areTyping = 0;
+
+// Set view engine to EJS and locate views
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/views'));
+
 // Set up static files directory
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
 app.get('/', (request, response) => {
-  response.sendFile(path.join(__dirname, 'client/index.html'));
+  response.render('index', {messages: messages});
 });
 
 app.get('/favicon.ico', (request, response) => {
@@ -36,10 +46,6 @@ app.get('/favicon.ico', (request, response) => {
 app.get('*', (request, response) => {
   response.redirect('/');
 });
-
-const messages = [];
-const authors = [];
-let areTyping = 0;
 
 io.on('connection', (socket) => {
   const authorId = authors.length;

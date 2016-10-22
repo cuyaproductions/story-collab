@@ -27,7 +27,7 @@ function formSubmitHandler(event) {
   messageInput.value = '';
 }
 
-function newMessageHander(data) {
+function newMessageHandler(data) {
   addMessage(data.message);
 }
 
@@ -58,7 +58,7 @@ function inputChangeHandler(event) {
 function init() {
   messageInput.addEventListener('keyup', inputChangeHandler);
   form.addEventListener('submit', formSubmitHandler);
-  socket.on('new message', newMessageHander);
+  socket.on('new message', newMessageHandler);
   socket.on('other typing', updateTypingNotice);
 }
 
