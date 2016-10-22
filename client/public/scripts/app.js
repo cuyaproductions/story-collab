@@ -1,4 +1,3 @@
-
 const socket = io(location.href);
 
 const story = document.getElementById('story');
