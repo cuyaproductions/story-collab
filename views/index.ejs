@@ -3,24 +3,24 @@
   <head>
     <meta charset="utf-8">
     <title>Story Collab!</title>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet">
+    <link rel="stylesheet" href="/public/styles/main.css">
   </head>
   <body>
-    <div id="app">
-        <section id="story" class="story">
-          <!-- This is where the story snippets will go -->
-          <% for (const message of messages) { %>
-            <span class="story__message"><%= message %></span>
-          <% } %>
-        </section>
+    <section id="story" class="story">
+      <!-- This is where the story snippets will go -->
+      <% for (const message of messages) { %>
+        <span class="story__message"><%= message %></span>
+      <% } %>
+    </section>
 
-        <footer class="user-input">
-          <form class="user-input__form" id="input-form">
-              <input type="text" id="input-text" class="user-input__text" placeholder="Continue story here!"/>
-              <button class="user-input__submit">Add to story</button>
-          </form>
-          <small class="typing-notice" id="active-notice"><span class="typing-notice__number" id="active-authors"></span> authors are typing</small>
-        </footer>
-    </div>
+    <footer class="user-input">
+      <form class="user-input__form" id="input-form">
+          <input type="text" id="input-text" class="user-input__text" placeholder="Continue story here!"/>
+          <button class="user-input__submit">Add to story</button>
+      </form>
+      <small class="typing-notice" id="active-notice"><span class="typing-notice__number" id="active-authors"></span> authors are typing</small>
+    </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.5.0/socket.io.min.js" charset="utf-8"></script>
     <script src="public/scripts/app.js"></script>
   </body>
