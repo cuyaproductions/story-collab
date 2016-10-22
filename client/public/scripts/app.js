@@ -13,18 +13,21 @@ function addMessage(message) {
 
   messageElement.classList.add('story__message');
   messageElement.textContent = message.trim() + ' ';
+  messageElement.tabIndex = 1;
 
   story.appendChild(messageElement);
 }
 
 function formSubmitHandler(event) {
   event.preventDefault();
-
-  socket.emit('add message', {message: messageInput.value});
-  socket.emit('stop typing');
-  isTyping = false;
-  addMessage(messageInput.value);
-  messageInput.value = '';
+  
+  if (messageInput.value.length > 0) {
+    socket.emit('add message', {message: messageInput.value});
+    socket.emit('stop typing');
+    isTyping = false;
+    addMessage(messageInput.value);
+    messageInput.value = '';
+  }
 }
 
 function newMessageHandler(data) {

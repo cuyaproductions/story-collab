@@ -1,41 +1,98 @@
 html {
-  font-size: 100%;
+  font-size: 120%;
   height: 100%;
 }
 
 body {
   margin: 0;
-  background-color: #ffadfe;
+  background-color: #f4fafb;
   height: 100%;
   display: flex;
   flex-direction: column;
   font-family: 'Droid Serif', georgia, times, serif;
+  color: #1d1e1e;
+}
+
+input, button {
+  font-size: 1rem;
 }
 
 .story {
   flex: 1 1 auto;
+  position: relative;
+}
+
+.story__container {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid #DDD;
+  width: calc(100% - 5em);
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  background-color: #FFF;
+  margin: 2em 2em 0;
+  padding: 0.5em;
+  transition: height 300ms;
+  overflow: auto;
+  max-height: calc(100% - 1em);
+  line-height: 1.5;
+}
+
+.story__message {
+  transition: background-color 250ms;
+  cursor: pointer;
+}
+
+.story__message:focus {
+  outline: 1px dotted;
+}
+
+.story__message:nth-child(n):hover,
+.story__message:nth-child(n):focus {
+  background-color: #BDD3CB;
+  outline-color: #BDD3CB;
+}
+.story__message:nth-child(2n):hover,
+.story__message:nth-child(2n):focus {
+  background-color: #E3BAC1;
+  outline-color: #E3BAC1;
+}
+.story__message:nth-child(3n):hover,
+.story__message:nth-child(3n):focus {
+  background-color: #FDDFC3;
+  outline-color: #FDDFC3;
+}
+.story__message:nth-child(4n):hover,
+.story__message:nth-child(4n):focus {
+  background-color: #F7D4BE;
+  outline-color: #F7D4BE;
+}
+.story__message:nth-child(5n):hover,
+.story__message:nth-child(5n):focus {
+  background-color: #AEB4D6;
+  outline-color: #AEB4D6;
 }
 
 .user-input {
   flex: 0;
-  background: #001e3d;
-  padding: 0.2em;
+  background-color: #3b6e78;
+  color: #FFF;
+  padding: 0.4em 2em;
 }
   .user-input__form {
     display: flex;
     align-items: stretch;
   }
   .user-input__text {
-    height: 1.1em;
-    font-size: 1.4em;
     flex: 1 1 auto;
+    padding: 0.4em;
     border: 0;
   }
   .user-input__submit {
     appearance: none;
-    height: 1.1em;
-    width: 1.1em;
     border: none;
-    background-color: #0069d6;
+    background-color: #ca7607;
+    color: white;
+    font-size: 0.8em;
   }
 
