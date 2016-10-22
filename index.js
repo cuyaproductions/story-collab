@@ -28,15 +28,20 @@ const messages = [];
 const authors = [];
 
 io.on('connection', (socket) => {
-  console.log('New author connected.');
-  authors.push(this);
+  const authorId = authors.length;
+  authors.push(socket);
+  console.log(`New author #${authorId} connected :)`);
 
     socket.on('add message', (data) => {
-      console.log(`New message from ${authors.indexOf(this)}: ${data.message}`);
+      console.log(`New message from #${authorId}: ${data.message}`);
       messages.push(data.message);
       // emit message to other users
       socket.emit('new message', data);
       // send to Firebase to store
+    });
+
+    socket.on('disconnect', () => {
+      console.log(`Author #${authorId} left :(`)
     });
 });
 
