@@ -19,11 +19,20 @@ const io = require('socket.io')(server);
 const path = require('path');
 
 const port = process.env.PORT || 3000;
+//Loads in the Number of Past Messages on Current Story
+var messageNumber = 0;
+firebase.database().ref('Storys/One/Total').once('value').then(function(snapshot){
+  messageNumber = snapshot.val();
+  if(messageNumber == null){
+    messageNumber = 0;
+  }
 
+});
 const authors = [];
 const messages = [];
+const pastMessages =[];
 
-let messageNumber = 0;
+
 let areTyping = 0;
 
 // Set view engine to EJS and locate views
@@ -34,7 +43,8 @@ app.set('views', path.join(__dirname, '/views'));
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
 app.get('/', (request, response) => {
-  response.render('index', {messages: messages});
+  response.render('index', {messages: pastMessages});
+  console.log(messages);
 });
 
 app.get('/favicon.ico', (request, response) => {
@@ -48,6 +58,7 @@ app.get('*', (request, response) => {
 });
 
 io.on('connection', (socket) => {
+  readStoryFromDatabase();
   const authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :)`);
@@ -64,7 +75,8 @@ io.on('connection', (socket) => {
     // Broadcast new message to all other sockets
     socket.broadcast.emit('new message', data);
     // send to Firebase to store
-
+    writeMessageContent(messageNumber, data.message, authorId);
+    messageNumber = messageNumber+1;
   });
 
   // Notify all authors that this author is typing
@@ -84,3 +96,23 @@ server.listen(port, () => {
   console.log(`Listening on port http://localhost:${port}/`);
 });
 
+function writeMessageContent(messageNumber, message, authorId){
+    var date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    firebase.database().ref('message/one/' + messageNumber).set({
+    author: authorId,
+    contents : message,
+    timestamp: date,
+    upvote : 0,
+    downvote: 0});
+    firebase.database().ref('Storys/One/').update({
+    Total: messageNumber+1});
+}
+function readStoryFromDatabase(){
+  firebase.database().ref('message/one').once('value').then(function(snapshot){
+    var pastStory = snapshot.val();
+    for(var i = pastStory.length - 1; i >= 0; i--) {
+      pastMessages[i] = pastStory[i].contents
+    };
+    // console.log(pastMessages);
+  });
+}

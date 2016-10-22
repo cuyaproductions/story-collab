@@ -8,9 +8,9 @@
     <div id="app">
         <section id="story" class="story">
           <!-- This is where the story snippets will go -->
-          <% for (const message of messages) { %>
+          <% messages.forEach(function (message) { %>
             <span class="story__message"><%= message %></span>
-          <% } %>
+          <% }); %>
         </section>
 
         <footer class="user-input">
