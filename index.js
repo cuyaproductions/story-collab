@@ -34,7 +34,16 @@ app.set('views', path.join(__dirname, '/views'));
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
 app.get('/', (request, response) => {
-  response.render('index', {messages: messages});
+  response.render('index', {stories: require('./tmp/stories.json')});
+});
+
+app.get('/story', (request, response) => {
+  response.render('story', {messages: []});
+});
+
+app.get('/story/:id', (request, response) => {
+  console.log(request.params.id);
+  response.render('story', {messages: messages});
 });
 
 app.get('/favicon.ico', (request, response) => {
@@ -51,11 +60,6 @@ io.on('connection', (socket) => {
   const authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :)`);
-
-  // Disconnect event
-  socket.on('disconnect', () => {
-    console.log(`Author #${authorId} left :(`)
-  });
 
   // When this socket adds a new message
   socket.on('add message', (data) => {
@@ -77,6 +81,11 @@ io.on('connection', (socket) => {
   socket.on('stop typing', () => {
     console.log(`Author #${authorId} stopped typing.`);
     socket.broadcast.emit('other typing', --areTyping);
+  });
+
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log(`Author #${authorId} left :(`);
   });
 });
 

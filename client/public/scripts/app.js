@@ -1,4 +1,4 @@
-const socket = io(location.href);
+const socket = io(location.host);
 
 const story = document.getElementById('story');
 const form = document.getElementById('input-form');
@@ -20,11 +20,11 @@ function addMessage(message) {
 
 function formSubmitHandler(event) {
   event.preventDefault();
-  
+  debugger;
   if (messageInput.value.length > 0) {
     socket.emit('add message', {message: messageInput.value});
-    socket.emit('stop typing');
-    isTyping = false;
+    // socket.emit('stop typing');
+    // isTyping = false;
     addMessage(messageInput.value);
     messageInput.value = '';
   }
@@ -59,8 +59,9 @@ function inputChangeHandler(event) {
 }
 
 function init() {
-  messageInput.addEventListener('keyup', inputChangeHandler);
+  // messageInput.addEventListener('keyup', inputChangeHandler);
   form.addEventListener('submit', formSubmitHandler);
+
   socket.on('new message', newMessageHandler);
   socket.on('other typing', updateTypingNotice);
 }

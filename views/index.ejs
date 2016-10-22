@@ -1,29 +1,29 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Story Collab!</title>
-    <link href="https://fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet">
-    <link rel="stylesheet" href="/public/styles/main.css">
-  </head>
-  <body>
-    <section class="story">
-      <div id="story" class="story__container">
-        <!-- This is where the story snippets will go -->
-        <% messages.forEach(function (message) { %>
-          <span class="story__message" tabindex="1"><%= message %></span>
-        <% }); %>
-      </div>
-    </section>
-
-    <footer class="user-input">
-      <form class="user-input__form" id="input-form">
-          <input type="text" id="input-text" class="user-input__text" placeholder="Continue story here!"/>
-          <button class="user-input__submit">Add</button>
-      </form>
-      <small class="typing-notice" id="active-notice"><span class="typing-notice__number" id="active-authors"></span> authors are typing</small>
-    </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.5.0/socket.io.min.js" charset="utf-8"></script>
-    <script src="public/scripts/app.js"></script>
-  </body>
-</html>
+<%- include('partials/header'); %>
+<header>
+  <a href="/story" id="start-story">Start a story</a>
+</header>
+<section class="category">
+  <h2 class="category__title">Open Stories</h2>
+  <ul class="category__list">
+    <% stories.forEach(function(story) { %>
+        <li class="category__item">
+          <div class="story-preview">
+            <h3 class="story-preview__title"><%= story.title %>...</h3>
+            <footer class="story-preview__footer story-data">
+              <ul class="story-data__list">
+                <li class="story-data__item">
+                  <bold class="story-data__type">Active Authors:</bold>
+                  <%= story.authors.length %>
+                </li>
+                <li class="story-data__item">
+                  <bold class="story-data__type">Date Created:</bold>
+                  <%= story.timestamp %>
+                </li>
+              </ul>
+            </footer>
+          </div>
+        </li>
+    <% }); %>
+  </ul>
+</section>
+<%- include('partials/footer'); %>
