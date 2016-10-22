@@ -1,0 +1,23 @@
+{
+  "name": "story-collab",
+  "version": "1.0.0",
+  "description": "Collaborative storytelling app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cuyaproductions/story-collab.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cuyaproductions/story-collab/issues"
+  },
+  "homepage": "https://github.com/cuyaproductions/story-collab#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "websocket": "^1.0.23"
+  }
+}
