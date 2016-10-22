@@ -1,4 +1,4 @@
-// const socket = io(location.href);
+const socket = io(location.href);
 
 const story = document.getElementById('story');
 const form = document.getElementById('input-form');
@@ -16,7 +16,7 @@ function addMessage(message) {
 function formSubmitHandler(event) {
   event.preventDefault();
 
-  // socket.emit('add message', {message: messageInput.value});
+  socket.emit('add message', {message: messageInput.value});
   addMessage(messageInput.value);
   messageInput.value = '';
 }
@@ -27,7 +27,7 @@ function newMessageHander(message) {
 
 function init() {
   form.addEventListener('submit', formSubmitHandler);
-  // socket.on('new message', newMessageHander);
+  socket.on('new message', newMessageHander);
 }
 
 init();
