@@ -9,7 +9,7 @@ Collaborative storytelling app
 // TODO: Replace with your project's customized code snippet
 var config = {
   apiKey: "<API_KEY>",
-  authDomain: "<PROJECT_ID>.firebaseapp.com",
+  authDomain: "<PROJECT_ID>.firebaseapp.com", dfasdfasf
   databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
   storageBucket: "<BUCKET>.appspot.com",
 };
