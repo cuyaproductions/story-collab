@@ -1,3 +1,4 @@
+ "use strict";
 //initialize firebase
 var firebase = require("firebase");
 var config = {
@@ -57,11 +58,7 @@ io.on('connection', (socket) => {
     // Broadcast new message to all other sockets
     socket.broadcast.emit('new message', data);
     // send to Firebase to store
-    newMessage = {};
-    newMessage[messageNumber] = data.message;
-    firebase.database().ref('message/' + messageNumber).set({
-      contents : data.message});
-    messageNumber = messageNumber+1;
+
   });
 
   // Notify all authors that this author is typing
