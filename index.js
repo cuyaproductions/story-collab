@@ -26,23 +26,38 @@ app.get('*', (request, response) => {
 
 const messages = [];
 const authors = [];
+let areTyping = 0;
 
 io.on('connection', (socket) => {
   const authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :)`);
 
-    socket.on('add message', (data) => {
-      console.log(`New message from #${authorId}: ${data.message}`);
-      messages.push(data.message);
-      // emit message to other users
-      socket.broadcast.emit('new message', data);
-      // send to Firebase to store
-    });
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log(`Author #${authorId} left :(`)
+  });
 
-    socket.on('disconnect', () => {
-      console.log(`Author #${authorId} left :(`)
-    });
+  // When this socket adds a new message
+  socket.on('add message', (data) => {
+    console.log(`New message from #${authorId}: ${data.message}`);
+    messages.push(data.message);
+    // Broadcast new message to all other sockets
+    socket.broadcast.emit('new message', data);
+    // send to Firebase to store
+  });
+
+  // Notify all authors that this author is typing
+  socket.on('start typing', () => {
+    console.log(`Author #${authorId} is typing.`);
+    socket.broadcast.emit('other typing', ++areTyping);
+  });
+
+  // Notify all authors that this author stopped typing
+  socket.on('stop typing', () => {
+    console.log(`Author #${authorId} stopped typing.`);
+    socket.broadcast.emit('other typing', --areTyping);
+  });
 });
 
 server.listen(port, () => {
