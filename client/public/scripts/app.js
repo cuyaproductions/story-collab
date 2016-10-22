@@ -1,4 +1,6 @@
 // const socket = io(location.href);
+//initialize firebase
+var firebase = require("firebase");
 
 const story = document.getElementById('story');
 const form = document.getElementById('input-form');
