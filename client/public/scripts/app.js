@@ -1,5 +1,3 @@
-//initialize firebase
-var firebase = require("firebase");
 const socket = io(location.href);
 
 const story = document.getElementById('story');

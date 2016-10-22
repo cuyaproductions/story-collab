@@ -25,10 +25,14 @@ app.get('*', (request, response) => {
 });
 
 const messages = [];
+const authors = [];
 
 io.on('connection', (socket) => {
   console.log('New author connected.');
+  authors.push(this);
+
     socket.on('add message', (data) => {
+      console.log(`New message from ${authors.indexOf(this)}: ${data.message}`);
       messages.push(data.message);
       // emit message to other users
       socket.emit('new message', data);
