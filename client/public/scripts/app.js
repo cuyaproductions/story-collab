@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-// const socket = io(location.href);
 //initialize firebase
 var firebase = require("firebase");
-=======
 const socket = io(location.href);
->>>>>>> origin/master
 
 const story = document.getElementById('story');
 const form = document.getElementById('input-form');
