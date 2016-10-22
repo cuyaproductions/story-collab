@@ -7,18 +7,26 @@ body {
   margin: 0;
   background-color: #f4fafb;
   height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   font-family: 'Droid Serif', georgia, times, serif;
   color: #1d1e1e;
 }
 
 input, button {
+  font-size: 19.2px;
   font-size: 1rem;
 }
 
 .story {
-  flex: 1 1 auto;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1 auto;
+          flex: 1 1 auto;
   position: relative;
 }
 
@@ -32,6 +40,7 @@ input, button {
   background-color: #FFF;
   margin: 2em 2em 0;
   padding: 0.5em;
+  -webkit-transition: height 300ms;
   transition: height 300ms;
   overflow: auto;
   max-height: calc(100% - 1em);
@@ -39,6 +48,7 @@ input, button {
 }
 
 .story__message {
+  -webkit-transition: background-color 250ms;
   transition: background-color 250ms;
   cursor: pointer;
 }
@@ -74,22 +84,32 @@ input, button {
 }
 
 .user-input {
-  flex: 0;
+  -webkit-box-flex: 0;
+      -ms-flex: 0;
+          flex: 0;
   background-color: #3b6e78;
   color: #FFF;
   padding: 0.4em 2em;
 }
   .user-input__form {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    align-items: stretch;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
   }
   .user-input__text {
-    flex: 1 1 auto;
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
     padding: 0.4em;
     border: 0;
   }
   .user-input__submit {
-    appearance: none;
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
     border: none;
     background-color: #ca7607;
     color: white;
