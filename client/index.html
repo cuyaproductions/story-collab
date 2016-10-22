@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Story Collab!</title>
+  </head>
+  <body>
+    <div id="app">
+        <section id="story" class="story">
+          <!-- This is where the story snippets will go -->
+        </section>
+        <footer class="user-input">
+          <form class="user-input__form" id="input-form">
+              <input type="text" id="input-text" class="user-input__text" placeholder="Continue story here!"/>
+              <button class="user-input__submit">Add to story</button>
+          </form>
+        </footer>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.5.0/socket.io.min.js" charset="utf-8"></script>
+    <script src="public/scripts/app.js"></script>
+  </body>
+</html>
