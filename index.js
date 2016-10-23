@@ -38,11 +38,15 @@ app.get('/', (request, response) => {
 });
 
 app.get('/story', (request, response) => {
-  response.render('story', {messages: []});
+  // create story in firebase here and put this in the callback to redirect to
+  // response.redirect(`/story/${story.id}`);
+
+  // REMOVE THIS WHEN FIREBASE STORY CREATION IS HERE
+  response.end('Endpoint not working yet');
 });
 
 app.get('/story/:id', (request, response) => {
-  console.log(request.params.id);
+  // query firebase for messages and put this in the callback
   response.render('story', {messages: messages});
 });
 
