@@ -29,10 +29,11 @@ input, button {
   font-size: 1.4em;
   margin-bottom: 0;
 }
-.create {
+.header {
   background-color: #3b6e78;
   color: #FFF;
   padding: 0.3em;
+  overflow: hidden;
 }
 
 .create__button {
@@ -51,7 +52,7 @@ input, button {
   padding: 1em;
 }
 
-.category__list {
+.story-list {
   list-style: none;
   padding-left: 0;
 }
@@ -88,15 +89,22 @@ input, button {
 .story-data__item {
   display: inline-block;
   margin-right: 1.3em;
+  line-height: 1.5;
 }
 .story {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-board {
   -webkit-box-flex: 1;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
   position: relative;
 }
 
-.story__container {
+.story-board__container {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   border: 1px solid #DDD;
   width: calc(100% - 5em);
@@ -113,38 +121,38 @@ input, button {
   line-height: 1.5;
 }
 
-.story__message {
+.story-board__message {
   -webkit-transition: background-color 250ms;
   transition: background-color 250ms;
   cursor: pointer;
 }
 
-.story__message:focus {
+.story-board__message:focus {
   outline: 1px dotted;
 }
 
-.story__message:nth-child(n):hover,
-.story__message:nth-child(n):focus {
+.story-board__message:nth-child(n):hover,
+.story-board__message:nth-child(n):focus {
   background-color: #BDD3CB;
   outline-color: #BDD3CB;
 }
-.story__message:nth-child(2n):hover,
-.story__message:nth-child(2n):focus {
+.story-board__message:nth-child(2n):hover,
+.story-board__message:nth-child(2n):focus {
   background-color: #E3BAC1;
   outline-color: #E3BAC1;
 }
-.story__message:nth-child(3n):hover,
-.story__message:nth-child(3n):focus {
+.story-board__message:nth-child(3n):hover,
+.story-board__message:nth-child(3n):focus {
   background-color: #FDDFC3;
   outline-color: #FDDFC3;
 }
-.story__message:nth-child(4n):hover,
-.story__message:nth-child(4n):focus {
+.story-board__message:nth-child(4n):hover,
+.story-board__message:nth-child(4n):focus {
   background-color: #F7D4BE;
   outline-color: #F7D4BE;
 }
-.story__message:nth-child(5n):hover,
-.story__message:nth-child(5n):focus {
+.story-board__message:nth-child(5n):hover,
+.story-board__message:nth-child(5n):focus {
   background-color: #AEB4D6;
   outline-color: #AEB4D6;
 }

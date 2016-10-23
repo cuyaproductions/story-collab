@@ -33,32 +33,27 @@ app.set('views', path.join(__dirname, '/views'));
 // Set up static files directory
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
-app.get('/', (request, response) => {
-  response.render('index', {stories: require('./tmp/stories.json')});
-});
-
-app.get('/story', (request, response) => {
-  // create story in firebase here and put this in the callback to redirect to
-  // response.redirect(`/story/${story.id}`);
-
-  // REMOVE THIS WHEN FIREBASE STORY CREATION IS HERE
-  response.end('Endpoint not working yet');
-});
-
-app.get('/story/:id', (request, response) => {
-  // query firebase for messages and put this in the callback
-  response.render('story', {messages: messages});
-});
-
 app.get('/favicon.ico', (request, response) => {
   response.sendStatus(200)
     .end();
 });
 
-// Always send the index.html
 app.get('*', (request, response) => {
-  response.redirect('/');
+  response.render('index');
 });
+
+// app.get('api/story', (request, response) => {
+//   // create story in firebase here and put this in the callback to redirect to
+//   // response.redirect(`/story/${story.id}`);
+//
+//   // REMOVE THIS WHEN FIREBASE STORY CREATION IS HERE
+//   response.end('Endpoint not working yet');
+// });
+//
+// app.get('api/story/:id', (request, response) => {
+//   // query firebase for messages and put this in the callback
+//   response.render('story', {messages: messages});
+// });
 
 io.on('connection', (socket) => {
   const authorId = authors.length;
