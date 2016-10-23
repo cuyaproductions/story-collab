@@ -28854,20 +28854,25 @@
 	    var _this = _possibleConstructorReturn(this, (Story.__proto__ || Object.getPrototypeOf(Story)).call(this, props));
 
 	    _this.state = {
-	      id: '',
+	      id: _this.props.params.storyId || '',
 	      endTime: 0,
 	      messages: []
 	    };
 
 	    _this.onAllMessages = _this.onAllMessages.bind(_this);
+	    _this.onNewMessage = _this.onNewMessage.bind(_this);
+	    _this.onAddMessage = _this.onAddMessage.bind(_this);
 
 	    socket.on('all messages', _this.onAllMessages);
+	    socket.on('new message', _this.onNewMessage);
+
 	    return _this;
 	  }
 
 	  _createClass(Story, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
+	      console.log(this.state);
 	      var storyId = this.props.params.storyId;
 
 	      if (storyId) {
@@ -28880,14 +28885,26 @@
 	      this.setState(data);
 	    }
 	  }, {
+	    key: 'onNewMessage',
+	    value: function onNewMessage(data) {
+	      if (data.id === this.props.params.storyId) {
+	        this.setState({ messages: data.messages });
+	      }
+	    }
+	  }, {
+	    key: 'onAddMessage',
+	    value: function onAddMessage(message) {
+	      this.onNewMessage(message);
+	      socket.emit('add message', { id: this.props.params.storyId, message: message });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log(this.state);
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'story' },
 	        _react2.default.createElement(_StoryBoard2.default, { messages: this.state.messages }),
-	        _react2.default.createElement(_StoryInput2.default, null)
+	        _react2.default.createElement(_StoryInput2.default, { onAddMessage: this.onAddMessage })
 	      );
 	    }
 	  }]);
@@ -36416,11 +36433,13 @@
 /* 313 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(1);
 
@@ -36428,28 +36447,66 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var StoryInput = function StoryInput() {
-	  return _react2.default.createElement(
-	    "footer",
-	    { className: "user-input" },
-	    _react2.default.createElement(
-	      "form",
-	      { className: "user-input__form", id: "input-form" },
-	      _react2.default.createElement("input", { type: "text", id: "input-text", className: "user-input__text", placeholder: "Continue story here!" }),
-	      _react2.default.createElement(
-	        "button",
-	        { className: "user-input__submit" },
-	        "Add"
-	      )
-	    ),
-	    _react2.default.createElement(
-	      "small",
-	      { className: "typing-notice", id: "active-notice" },
-	      _react2.default.createElement("span", { className: "typing-notice__number", id: "active-authors" }),
-	      " authors are typing"
-	    )
-	  );
-	};
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var StoryInput = function (_Component) {
+	  _inherits(StoryInput, _Component);
+
+	  function StoryInput(props) {
+	    _classCallCheck(this, StoryInput);
+
+	    var _this = _possibleConstructorReturn(this, (StoryInput.__proto__ || Object.getPrototypeOf(StoryInput)).call(this, props));
+
+	    _this.state = {
+	      message: ''
+	    };
+
+	    _this.onTextChange = _this.onTextChange.bind(_this);
+	    _this.onFormSubmit = _this.onFormSubmit.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(StoryInput, [{
+	    key: 'onTextChange',
+	    value: function onTextChange(event) {
+	      var message = event.target.value;
+	      this.setState({ message: message });
+	    }
+	  }, {
+	    key: 'onFormSubmit',
+	    value: function onFormSubmit(event) {
+	      event.preventDefault();
+	      this.props.onAddMessage(this.state.message);
+	      this.setState({ message: '' });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'footer',
+	        { className: 'user-input' },
+	        _react2.default.createElement(
+	          'form',
+	          { className: 'user-input__form', id: 'input-form', onSubmit: this.onFormSubmit },
+	          _react2.default.createElement('input', { type: 'text', id: 'input-text', className: 'user-input__text', value: this.state.message, placeholder: 'Continue story here!', onChange: this.onTextChange }),
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'user-input__submit' },
+	            'Add'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return StoryInput;
+	}(_react.Component);
+
+	;
 
 	exports.default = StoryInput;
 

@@ -17,17 +17,22 @@ class Story extends Component {
     super(props);
 
     this.state = {
-      id: '',
+      id: this.props.params.storyId || '',
       endTime: 0,
       messages: [],
     }
 
     this.onAllMessages =  this.onAllMessages.bind(this);
+    this.onNewMessage =  this.onNewMessage.bind(this);
+    this.onAddMessage =  this.onAddMessage.bind(this);
 
     socket.on('all messages', this.onAllMessages);
+    socket.on('new message', this.onNewMessage);
+
   }
 
   componentDidMount() {
+    console.log(this.state);
     const {storyId} = this.props.params;
     if (storyId) {
       socket.emit('show story', storyId);
@@ -38,12 +43,22 @@ class Story extends Component {
     this.setState(data);
   }
 
+  onNewMessage(data) {
+    if (data.id === this.props.params.storyId) {
+      this.setState({ messages: data.messages });
+    }
+  }
+
+  onAddMessage(message) {
+    this.onNewMessage(message);
+    socket.emit('add message', {id: this.props.params.storyId, message: message});
+  }
+
   render() {
-    console.log(this.state);
     return (
       <div className="story">
         <StoryBoard messages={this.state.messages} />
-        <StoryInput />
+        <StoryInput onAddMessage={this.onAddMessage} />
       </div>
     );
   }

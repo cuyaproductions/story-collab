@@ -96,7 +96,6 @@ io.on('connection', function (socket) {
         for(var i = pastStory.length - 1; i >= 0; i--) {
           messages[i] = pastStory[i].contents
         };
-      //messages.push(pastStory.contents);
       console.log('Messages array:' + messages);
 
       socket.emit('all messages',
@@ -115,18 +114,18 @@ io.on('connection', function (socket) {
 
   // When this socket adds a new message
   socket.on('add message', function (data) {
-    firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
+    firebase.database().ref('message/'+data.id).once('value').then(function(snapshot){
       var messageJson = snapshot.val();
       messageNumber =(Object.keys(messageJson).length);
+
+      console.log(`New message from #${authorId}: ${data.message}`);
+      // console.log('data.message:' + data.message);
+      //messages.push(data.message);
+      // console.log('message array:' + messages);
+      // Broadcast new message to all other sockets
+      // send to Firebase to store
+      writeMessageContent(messages, data.message, authorId, data.id, messageNumber, socket);
       });
-    console.log(`New message from #${authorId}: ${data.message}`);
-    // console.log('data.message:' + data.message);
-    //messages.push(data.message);
-    console.log('message array:' + messages);
-    // Broadcast new message to all other sockets
-    socket.broadcast.emit('new message', data);
-    // send to Firebase to store
-    writeMessageContent(messages, data.message, authorId, currentStoryID, messageNumber);
   });
 
   // Notify all authors that this author is typing
@@ -148,9 +147,7 @@ server.listen(port, function () {
   console.log(`Listening on port http://localhost:${port}/`);
 });
 
-function writeMessageContent(messages, message, authorId, currentStoryID, messageNumber){
-    //updates the message array
-    messages.push(message);
+function writeMessageContent(messages, message, authorId, currentStoryID, messageNumber, socket){
     var date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
     //writes the message data to the firebase database
       firebase.database().ref('message/'+currentStoryID+'/'+ messageNumber).set({
@@ -158,7 +155,18 @@ function writeMessageContent(messages, message, authorId, currentStoryID, messag
       contents : message,
       timestamp: date,
       upvote : 0,
-      downvote: 0});
+      downvote: 0}).then(function() {
+        readMessagesFromStory(currentStoryID, null).then(function (snapshot) {
+          var messagesObj = snapshot.val();
+          var allMessages = [];
+          for (var message in messagesObj) {
+            if (Object.hasOwnProperty(message)) {
+              allMessages.push(messagesObj[message]);
+            }
+          }
+          socket.broadcast.emit('new message', {id: currentStoryID, messages: allMessages });
+        })
+      });
       //if this is the first message to hit the firebase database it creates the "Story"
       if(messageNumber == 0){
         firebase.database().ref('Storys/'+currentStoryID).set({
@@ -177,18 +185,13 @@ function writeMessageContent(messages, message, authorId, currentStoryID, messag
 }
 
 function readMessagesFromStory(currentStoryID, messages){
-  console.log('StoryID in readMessagesFromStory: '+currentStoryID);
-  firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
-    var pastStory = snapshot.val();
-    // console.log('Past Story Object:' + pastStory);
-    // console.log('Past Story Length:' + pastStory.length);
-    messages = [];
-      for(var i = pastStory.length - 1; i >= 0; i--) {
-        messages[i] = pastStory[i].contents
-      };
-    //messages.push(pastStory.contents);
-    console.log('Messages array:' + messages);
-    });
+  // console.log('StoryID in readMessagesFromStory: '+currentStoryID);
+  return firebase.database().ref('message/'+currentStoryID).once('value');
+  // .then(function(snapshot){
+  //   var pastStory = snapshot.val();
+  //   // console.log('Past Story Object:' + pastStory);
+  //   // console.log('Past Story Length:' + pastStory.length);
+  //   });
 }
 
 function readUniqueIDs(){
