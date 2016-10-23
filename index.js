@@ -34,6 +34,8 @@ const pastMessages =[];
 
 
 let areTyping = 0;
+var titles = [];
+var uniqueIDs = [];
 
 // Set view engine to EJS and locate views
 app.set('view engine', 'ejs');
@@ -58,7 +60,9 @@ app.get('*', (request, response) => {
 });
 
 io.on('connection', (socket) => {
-  readStoryFromDatabase();
+  // readUniqueIDs();
+  writeUniqueID();
+  readMessagesFromStory();
   const authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :)`);
@@ -76,7 +80,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('new message', data);
     // send to Firebase to store
     writeMessageContent(messageNumber, data.message, authorId);
-    messageNumber = messageNumber+1;
+    messageNumber = messageNumber + 1;
   });
 
   // Notify all authors that this author is typing
@@ -98,7 +102,7 @@ server.listen(port, () => {
 
 function writeMessageContent(messageNumber, message, authorId){
     var date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-    firebase.database().ref('message/one/' + messageNumber).set({
+    firebase.database().ref('message/One/' + messageNumber).set({
     author: authorId,
     contents : message,
     timestamp: date,
@@ -107,12 +111,29 @@ function writeMessageContent(messageNumber, message, authorId){
     firebase.database().ref('Storys/One/').update({
     Total: messageNumber+1});
 }
-function readStoryFromDatabase(){
-  firebase.database().ref('message/one').once('value').then(function(snapshot){
+
+function readMessagesFromStory(){
+  firebase.database().ref('message/One').once('value').then(function(snapshot){
     var pastStory = snapshot.val();
     for(var i = pastStory.length - 1; i >= 0; i--) {
       pastMessages[i] = pastStory[i].contents
     };
-    // console.log(pastMessages);
   });
+}
+
+function readUniqueIDs(){
+  firebase.database().ref('UniqueTitleID/').once('value').then(function(snapshot){
+    uniqueIDs = snapshot.val();
+    firebase.database().ref('Storys/').once('value').then(function(snapshot){
+    var frontPage = snapshot.val(); 
+        titles[i] = uniqueIDs[1];
+    }); 
+  });
+}
+
+function writeUniqueID(){
+  firebase.database().ref('Storys/').once('value').then(function(snapshot){
+    var storys = snapshot.val();
+    storyArray = Object.keys(storys);
+    });  
 }
