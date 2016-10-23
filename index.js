@@ -20,23 +20,36 @@ const path = require('path');
 
 const port = process.env.PORT || 3000;
 //Loads in the Number of Past Messages on Current Story
-var messageNumber = 0;
-firebase.database().ref('Storys/One/Total').once('value').then(function(snapshot){
-  messageNumber = snapshot.val();
-  if(messageNumber == null){
-    messageNumber = 0;
-  }
+// firebase.database().ref('Storys/One/Total').once('value').then(function(snapshot){
+//   messageNumber = snapshot.val();
+//   if(messageNumber == null){
+//     messageNumber = 0;
+//   }
 
-});
+// });
 const authors = [];
-const messages = [];
-const pastMessages =[];
+var messages = [];
 
 
 let areTyping = 0;
 var titles = [];
 var uniqueIDs = [];
+var uniqueStories = [];
+var storyNumber = 0;
+var currentStoryID = 0;
+var messageNumber = 0;
 
+//Gets an object array filled with the unique stories. 
+function getUniqueStories(){
+  firebase.database().ref('Storys/').once('value').then(function(snapshot){
+    var storys = snapshot.val();
+    storyNumber =(Object.keys(storys).length); //updates the global containing the number of different stories
+    uniqueStories = Object.keys(storys).map(function(key) {
+       return storys[key];
+      });
+    });  
+}
+getUniqueStories();
 // Set view engine to EJS and locate views
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
@@ -45,8 +58,31 @@ app.set('views', path.join(__dirname, '/views'));
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
 app.get('/', (request, response) => {
-  response.render('index', {messages: pastMessages});
-  console.log(messages);
+  response.render('index', {stories: uniqueStories});
+});
+
+app.get('/story', (request, response) => {
+  //generates a new unique story ID key and redirects to that page
+  currentStoryID = guidGenerator();
+  response.redirect(`/story/${currentStoryID}`);
+  response.redirect(request.get('referer'));
+});
+
+app.get('/story/:id', (request, response) => {
+  currentStoryID = request.params.id;
+  //Read Messages From Current Story
+  console.log('StoryID in readMessagesFromStory: '+currentStoryID);
+  firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
+    var pastStory = snapshot.val();
+    messages = [];
+      for(var i = pastStory.length - 1; i >= 0; i--) {
+        messages[i] = pastStory[i].contents
+      };
+    //messages.push(pastStory.contents);
+    console.log('Messages array:' + messages);
+    });
+  response.render('story', {messages: messages});
+  response.redirect(request.get('/story/:id'));
 });
 
 app.get('/favicon.ico', (request, response) => {
@@ -60,27 +96,24 @@ app.get('*', (request, response) => {
 });
 
 io.on('connection', (socket) => {
-  // readUniqueIDs();
-  writeUniqueID();
-  readMessagesFromStory();
   const authorId = authors.length;
   authors.push(socket);
-  console.log(`New author #${authorId} connected :)`);
-
-  // Disconnect event
-  socket.on('disconnect', () => {
-    console.log(`Author #${authorId} left :(`)
-  });
+  console.log(`New author #${authorId} connected :D`);
 
   // When this socket adds a new message
   socket.on('add message', (data) => {
+    firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
+      var messageJson = snapshot.val();
+      messageNumber =(Object.keys(messageJson).length);
+      });
     console.log(`New message from #${authorId}: ${data.message}`);
-    messages.push(data.message);
+    // console.log('data.message:' + data.message);
+    //messages.push(data.message);
+    console.log('message array:' + messages);
     // Broadcast new message to all other sockets
     socket.broadcast.emit('new message', data);
     // send to Firebase to store
-    writeMessageContent(messageNumber, data.message, authorId);
-    messageNumber = messageNumber + 1;
+    writeMessageContent(messages, data.message, authorId, currentStoryID, messageNumber);
   });
 
   // Notify all authors that this author is typing
@@ -94,31 +127,58 @@ io.on('connection', (socket) => {
     console.log(`Author #${authorId} stopped typing.`);
     socket.broadcast.emit('other typing', --areTyping);
   });
+
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log(`Author #${authorId} left :(`);
+  });
 });
 
 server.listen(port, () => {
   console.log(`Listening on port http://localhost:${port}/`);
 });
 
-function writeMessageContent(messageNumber, message, authorId){
+function writeMessageContent(messages, message, authorId, currentStoryID, messageNumber){
+    //updates the message array
+    messages.push(message);
     var date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-    firebase.database().ref('message/One/' + messageNumber).set({
-    author: authorId,
-    contents : message,
-    timestamp: date,
-    upvote : 0,
-    downvote: 0});
-    firebase.database().ref('Storys/One/').update({
-    Total: messageNumber+1});
+    //writes the message data to the firebase database
+      firebase.database().ref('message/'+currentStoryID+'/'+ messageNumber).set({
+      author: authorId,
+      contents : message,
+      timestamp: date,
+      upvote : 0,
+      downvote: 0});
+      //if this is the first message to hit the firebase database it creates the "Story"
+      if(messageNumber == 0){
+        firebase.database().ref('Storys/'+currentStoryID).set({
+          authors: authorId,
+          Title : message,
+          timestamp: date,
+          id: currentStoryID
+        });
+        getUniqueStories();
+
+      }
+      //updates the total number of messages for that specific story
+      firebase.database().ref('Storys/'+currentStoryID).update({
+        Total: messageNumber+1
+      });
 }
 
-function readMessagesFromStory(){
-  firebase.database().ref('message/One').once('value').then(function(snapshot){
+function readMessagesFromStory(currentStoryID, messages){
+  console.log('StoryID in readMessagesFromStory: '+currentStoryID);
+  firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
     var pastStory = snapshot.val();
-    for(var i = pastStory.length - 1; i >= 0; i--) {
-      pastMessages[i] = pastStory[i].contents
-    };
-  });
+    // console.log('Past Story Object:' + pastStory);
+    // console.log('Past Story Length:' + pastStory.length);
+    messages = [];
+      for(var i = pastStory.length - 1; i >= 0; i--) {
+        messages[i] = pastStory[i].contents
+      };
+    //messages.push(pastStory.contents);
+    console.log('Messages array:' + messages);
+    });
 }
 
 function readUniqueIDs(){
@@ -130,10 +190,9 @@ function readUniqueIDs(){
     }); 
   });
 }
-
-function writeUniqueID(){
-  firebase.database().ref('Storys/').once('value').then(function(snapshot){
-    var storys = snapshot.val();
-    storyArray = Object.keys(storys);
-    });  
+function guidGenerator() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return S4();
 }
