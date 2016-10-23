@@ -57,54 +57,64 @@ app.set('views', path.join(__dirname, '/views'));
 // Set up static files directory
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
-app.get('/favicon.ico', (request, response) => {
+app.get('/favicon.ico', function (request, response) {
   response.sendStatus(200)
     .end();
 });
 
-app.get('/api/story', (request, response) => {
+app.get('/api/story', function (request, response) {
   response.json({stories: uniqueStories});
 });
 //
-// app.get('/story', (request, response) => {
+// app.get('/story', function (request, response) {
 //   //generates a new unique story ID key and redirects to that page
 //   currentStoryID = guidGenerator();
 //   response.redirect(`/story/${currentStoryID}`);
 //   response.redirect(request.get('referer'));
 // });
 //
-// app.get('/story/:id', (request, response) => {
+// app.get('/story/:id', function (request, response) {
 //   currentStoryID = request.params.id;
 //   //Read Messages From Current Story
-//   console.log('StoryID in readMessagesFromStory: '+currentStoryID);
-//   firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
-//     var pastStory = snapshot.val();
-//     messages = [];
-//       for(var i = pastStory.length - 1; i >= 0; i--) {
-//         messages[i] = pastStory[i].contents
-//       };
-//     //messages.push(pastStory.contents);
-//     console.log('Messages array:' + messages);
-//     });
-//   response.render('story', {messages: messages});
-//   response.redirect(request.get('/story/:id'));
 // });
-app.get('*', (request, response) => {
+app.get('*', function (request, response) {
   response.render('index');
 });
 
-io.on('connection', (socket) => {
+io.on('connection', function (socket) {
   var authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :D`);
 
+  socket.on('show story', function (id) {
+    // get messages for story with id from firebase then socket emit:
+    // { id: id, endTime: endTime, messages: []}
+    console.log('StoryID in readMessagesFromStory: '+id);
+    firebase.database().ref('message/' + id).once('value').then(function(snapshot){
+      var pastStory = snapshot.val();
+      messages = [];
+        for(var i = pastStory.length - 1; i >= 0; i--) {
+          messages[i] = pastStory[i].contents
+        };
+      //messages.push(pastStory.contents);
+      console.log('Messages array:' + messages);
+
+      socket.emit('all messages',
+        {
+          id: id,
+          messages: messages,
+          endTime: 0
+        });
+      });
+
+  });
   // Disconnect event
-  socket.on('disconnect', () => {
+  socket.on('disconnect', function () {
     console.log(`Author #${authorId} left :(`)
   });
 
   // When this socket adds a new message
-  socket.on('add message', (data) => {
+  socket.on('add message', function (data) {
     firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
       var messageJson = snapshot.val();
       messageNumber =(Object.keys(messageJson).length);
@@ -120,13 +130,13 @@ io.on('connection', (socket) => {
   });
 
   // Notify all authors that this author is typing
-  socket.on('start typing', () => {
+  socket.on('start typing', function () {
     console.log(`Author #${authorId} is typing.`);
     socket.emit('other typing', ++areTyping);
   });
 
   // Notify all authors that this author stopped typing
-  socket.on('stop typing', () => {
+  socket.on('stop typing', function () {
     console.log(`Author #${authorId} stopped typing.`);
     if (areTyping!=0){
     socket.emit('other typing', --areTyping);
@@ -134,7 +144,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(port, () => {
+server.listen(port, function () {
   console.log(`Listening on port http://localhost:${port}/`);
 });
 
