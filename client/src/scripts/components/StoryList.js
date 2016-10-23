@@ -6,8 +6,8 @@ const StoryList = (props) => {
     const date = new Date(story.timestamp).toLocaleTimeString();
     return (
       <li className="story-list__item" key={story.id}>
-        <Link to={`story`} className="story-preview">
-          <h3 className="story-preview__title">{story.title}&hellip;</h3>
+        <Link to={`story/${story.id}`} className="story-preview">
+          <h3 className="story-preview__title">{story.Title}&hellip;</h3>
           <footer className="story-preview__footer story-data">
             <ul className="story-data__list">
               <li className="story-data__item">
