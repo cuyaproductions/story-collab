@@ -100,6 +100,11 @@ io.on('connection', (socket) => {
   authors.push(socket);
   console.log(`New author #${authorId} connected :D`);
 
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log(`Author #${authorId} left :(`)
+  });
+
   // When this socket adds a new message
   socket.on('add message', (data) => {
     firebase.database().ref('message/'+currentStoryID).once('value').then(function(snapshot){
@@ -119,18 +124,15 @@ io.on('connection', (socket) => {
   // Notify all authors that this author is typing
   socket.on('start typing', () => {
     console.log(`Author #${authorId} is typing.`);
-    socket.broadcast.emit('other typing', ++areTyping);
+    socket.emit('other typing', ++areTyping);
   });
 
   // Notify all authors that this author stopped typing
   socket.on('stop typing', () => {
     console.log(`Author #${authorId} stopped typing.`);
-    socket.broadcast.emit('other typing', --areTyping);
-  });
-
-  // Disconnect event
-  socket.on('disconnect', () => {
-    console.log(`Author #${authorId} left :(`);
+    if (areTyping!=0){
+    socket.emit('other typing', --areTyping);
+  }
   });
 });
 
@@ -196,3 +198,4 @@ function guidGenerator() {
     };
     return S4();
 }
+
