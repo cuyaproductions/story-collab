@@ -11,14 +11,14 @@ var config = {
 
 firebase.initializeApp(config);
 
-const express = require('express');
-const app = express();
+var express = require('express');
+var app = express();
 
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-const path = require('path');
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+var path = require('path');
 
-const port = process.env.PORT || 3000;
+var port = process.env.PORT || 3000;
 //Loads in the Number of Past Messages on Current Story
 // firebase.database().ref('Storys/One/Total').once('value').then(function(snapshot){
 //   messageNumber = snapshot.val();
@@ -27,11 +27,11 @@ const port = process.env.PORT || 3000;
 //   }
 
 // });
-const authors = [];
+var authors = [];
 var messages = [];
 
 
-let areTyping = 0;
+var areTyping = 0;
 var titles = [];
 var uniqueIDs = [];
 var uniqueStories = [];
@@ -62,9 +62,9 @@ app.get('/favicon.ico', (request, response) => {
     .end();
 });
 
-// app.get('/', (request, response) => {
-//   response.render('index', {stories: uniqueStories});
-// });
+app.get('/api/story', (request, response) => {
+  response.json({stories: uniqueStories});
+});
 //
 // app.get('/story', (request, response) => {
 //   //generates a new unique story ID key and redirects to that page
@@ -94,7 +94,7 @@ app.get('*', (request, response) => {
 });
 
 io.on('connection', (socket) => {
-  const authorId = authors.length;
+  var authorId = authors.length;
   authors.push(socket);
   console.log(`New author #${authorId} connected :D`);
 
