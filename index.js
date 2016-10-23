@@ -34,7 +34,7 @@ app.set('views', path.join(__dirname, '/views'));
 app.use('/public', express.static(path.join(__dirname, 'client/public')));
 
 app.get('/', (request, response) => {
-  response.render('index', {messages: messages});
+  response.render('index', {messages: messages, areTyping: areTyping});
 });
 
 app.get('/favicon.ico', (request, response) => {
@@ -70,17 +70,18 @@ io.on('connection', (socket) => {
   // Notify all authors that this author is typing
   socket.on('start typing', () => {
     console.log(`Author #${authorId} is typing.`);
-    socket.broadcast.emit('other typing', ++areTyping);
+    socket.emit('other typing', ++areTyping);
   });
 
   // Notify all authors that this author stopped typing
   socket.on('stop typing', () => {
     console.log(`Author #${authorId} stopped typing.`);
-    socket.broadcast.emit('other typing', --areTyping);
+    if (areTyping!=0){
+    socket.emit('other typing', --areTyping);
+  }
   });
 });
 
 server.listen(port, () => {
   console.log(`Listening on port http://localhost:${port}/`);
 });
-
